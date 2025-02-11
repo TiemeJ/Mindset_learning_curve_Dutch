@@ -38,7 +38,7 @@ p{text-align:center;line-height:1.6;margin-bottom:20px;max-width:600px}
 <div class="container">
 <h1 class="main-title">Spiegeltekenen</h1>
 <div class="game-section">
-<p id="instructions"><strong>Zonder spiegel:</strong> Gebruik het trackpad (rechter vak) om het blauwe balletje tussen de groene cirkels te verplaatsen. Begin bij de pijl en voltooi de cirkel. Deze opdracht is nog zonder spiegel.</p>
+<p id="instructions"><strong>Zonder spiegel:</strong> Gebruik het trackpad (rechter vierkant) om het blauwe balletje tussen de groene cirkels te verplaatsen. Begin bij de pijl en voltooi de cirkel. Deze opdracht is nog zonder spiegel.</p>
 <div id="gameContainer">
 <div id="gameArea"><canvas id="trail"></canvas><canvas id="cursorPath"></canvas><div id="cursor"></div><div id="mistakeIndicator"></div></div>
 <div id="trackpad"></div>
@@ -46,22 +46,22 @@ p{text-align:center;line-height:1.6;margin-bottom:20px;max-width:600px}
 <div class="info-box"><p id="score">Zonder spiegel</p><p id="mistakeCount">Fouten: 0</p></div>
 </div>
 <div id="results" style="display:none">
-<div class="results-header"><h2>Your Learning Curve</h2><p>Great job completing the game! Here's a breakdown of your performance:</p></div>
+<div class="results-header"><h2>Jouw leerlijn</h2><p>Goed gedaan! Hieronder zie je je leerproces:</p></div>
 <div class="chart-row">
 <div class="chart-column">
-<div class="chart-title">Accuracy Performance</div>
+<div class="chart-title">Nauwkeurigheid</div>
 <div class="chart-container"><canvas id="mistakeChart"></canvas></div>
-<p class="chart-description">This graph shows your precision for each circle. A downward trend indicates improvement as you're making fewer mistakes.</p>
+<p class="chart-description">Dit grafiekje laat jouw nauwkeurigheid zien voor elke cirkel. Als de lijn omlaaggaat, maak je minder fouten en verbeter je.</p>
 </div>
 <div class="chart-column">
-<div class="chart-title">Time Performance</div>
+<div class="chart-title">Snelheid</div>
 <div class="chart-container"><canvas id="timeChart"></canvas></div>
-<p class="chart-description">This graph displays how quickly you completed each circle. A downward trend shows improvement as you're taking less time to finish.</p>
+<p class="chart-description">Dit grafiekje laat jouw snelheid zien voor elke cirkel. Als de lijn omlaaggaat, wordt je sneller en verbeter je.</p>
 </div>
 </div>
-<h3>Your Progress</h3>
+<h3>Jouw vooruitgang</h3>
 <div class="screenshots-container" id="screenshotsContainer"></div>
-<div class="btn-container"><button class="btn" onclick="location.reload()">Play Again</button></div>
+<div class="btn-container"><button class="btn" onclick="location.reload()">Speel opnieuw</button></div>
 </div>
 </div>
 <footer>&copy; 2024 Spiegeltekenen Spel</footer>
@@ -82,7 +82,7 @@ function displayScreenshots(){const e=document.getElementById("screenshotsContai
 function moveCursor(e){const t=trackpad.getBoundingClientRect(),a=(e.clientX||e.touches[0].clientX)-t.left,r=(e.clientY||e.touches[0].clientY)-t.top;if(isFirstMove)return lastTrackpadX=a,lastTrackpadY=r,void(isFirstMove=!1);const n=a-lastTrackpadX,i=r-lastTrackpadY;lastTrackpadX=a,lastTrackpadY=r;const s=lastX+(isNoMirror?1:-1)*n,o=lastY+(isNoMirror?1:-1)*i,c=Math.max(0,Math.min(s,gameArea.offsetWidth-6)),d=Math.max(0,Math.min(o,gameArea.offsetHeight-6));setCursorPosition(c,d),pathCtx.beginPath(),pathCtx.moveTo(lastX,lastY),pathCtx.lineTo(c,d),pathCtx.strokeStyle="rgba(52, 152, 219, 0.5)",pathCtx.lineWidth=2,pathCtx.stroke(),lastX=c,lastY=d,checkCircleProgress(c,d)}
 function checkCircleProgress(e,t){const a=Math.sqrt(Math.pow(e-centerX,2)+Math.pow(t-centerY,2));if(a>=innerRadius&&a<=outerRadius){isOutside&&(isOutside=!1,outsideStartTime=0);const a=Math.sqrt(Math.pow(e-startX,2)+Math.pow(t-startY,2));a>50&&(hasCompletedLoop=!0),hasCompletedLoop&&a<10&&endCircle()}else isOutside||(isOutside=!0,outsideStartTime=Date.now(),currentMistakes++,updateMistakeCount(),showMistakeIndicator(e,t))}
 function showMistakeIndicator(e,t){cursor.style.backgroundColor="#e74c3c",mistakeIndicator.style.left=`${e-20}px`,mistakeIndicator.style.top=`${t-20}px`,mistakeIndicator.style.display="block",mistakeIndicator.style.animation="none",mistakeIndicator.offsetHeight,mistakeIndicator.style.animation=null,setTimeout(()=>{cursor.style.backgroundColor="#3498db",mistakeIndicator.style.display="none"},500)}
-function updateMistakeCount(){mistakeCountDisplay.textContent=`Mistakes: ${currentMistakes}`}
+function updateMistakeCount(){mistakeCountDisplay.textContent=`Fouten ${currentMistakes}`}
 trail.width=gameArea.offsetWidth,trail.height=gameArea.offsetHeight,cursorPath.width=gameArea.offsetWidth,cursorPath.height=gameArea.offsetHeight,trackpad.addEventListener("mousedown",e=>{isFirstMove=!0,moveCursor(e)}),trackpad.addEventListener("mousemove",e=>{e.buttons>0&&moveCursor(e)}),trackpad.addEventListener("touchstart",e=>{e.preventDefault(),isFirstMove=!0,moveCursor(e.touches[0])}),trackpad.addEventListener("touchmove",e=>{e.preventDefault(),moveCursor(e.touches[0])}),startCircle();
 </script>
 </body>
