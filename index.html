@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Mind Your Learning Curve</title>
+<title>Spiegeltekenen</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.1/chart.min.js"></script>
 <style>
 body{font-family:sans-serif;display:flex;flex-direction:column;min-height:100vh;margin:0;background:linear-gradient(135deg,#f5f7fa 0%,#c3cfe2 100%);color:#333}
@@ -34,9 +34,9 @@ p{text-align:center;line-height:1.6;margin-bottom:20px;max-width:600px}
 </style>
 </head>
 <body>
-<header><h1>Mind Your Learning Curve</h1></header>
+<header><h1>Spiegeltekenen</h1></header>
 <div class="container">
-<h1 class="main-title">Mind Your Learning Curve</h1>
+<h1 class="main-title">Spiegeltekenen</h1>
 <div class="game-section">
 <p id="instructions"><strong>No mirror:</strong> Use the trackpad to move the blue cursor between the green circle trails. Start at the arrow and complete the circle once. Then, the mirrored game will begin!</p>
 <div id="gameContainer">
@@ -64,7 +64,7 @@ p{text-align:center;line-height:1.6;margin-bottom:20px;max-width:600px}
 <div class="btn-container"><button class="btn" onclick="location.reload()">Play Again</button></div>
 </div>
 </div>
-<footer>&copy; 2024 Mind Your Learning Curve Game</footer>
+<footer>&copy; 2024 Spiegeltekenen Spel</footer>
 <script>
 const gameArea=document.getElementById("gameArea"),trackpad=document.getElementById("trackpad"),cursor=document.getElementById("cursor"),trail=document.getElementById("trail"),cursorPath=document.getElementById("cursorPath"),ctx=trail.getContext("2d"),pathCtx=cursorPath.getContext("2d"),scoreDisplay=document.getElementById("score"),mistakeCountDisplay=document.getElementById("mistakeCount"),results=document.getElementById("results"),mistakeIndicator=document.getElementById("mistakeIndicator"),instructions=document.getElementById("instructions");
 let circleCount=0,startTime,times=[],mistakes=[],lastX,lastY,startX,startY,outerRadius,innerRadius,isFirstMove=!0,lastTrackpadX,lastTrackpadY,hasStartedRound=!1,hasCompletedLoop=!1,centerX,centerY,isOutside=!1,outsideStartTime=0,currentMistakes=0,screenshots=[],isNoMirror=!0;
