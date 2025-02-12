@@ -68,12 +68,12 @@ p{text-align:center;line-height:1.6;margin-bottom:20px;max-width:600px}
 <div class="chart-column">
 <div class="chart-title">Nauwkeurigheid</div>
 <div class="chart-container"><canvas id="mistakeChart"></canvas></div>
-<p class="chart-description">Dit grafiekje laat jouw nauwkeurigheid zien voor elke cirkel. Als de lijn omlaaggaat, maak je minder fouten en verbeter je.</p>
+<p class="chart-description" style="font-style: italic">Dit grafiekje laat jouw nauwkeurigheid zien voor elke cirkel. Als de lijn omlaaggaat, maak je minder fouten en verbeter je.</p>
 </div>
 <div class="chart-column">
 <div class="chart-title">Snelheid</div>
 <div class="chart-container"><canvas id="timeChart"></canvas></div>
-<p class="chart-description">Dit grafiekje laat jouw snelheid zien voor elke cirkel. Als de lijn omlaaggaat, wordt je sneller en verbeter je.</p>
+<p class="chart-description" style="font-style: italic">Dit grafiekje laat jouw snelheid zien voor elke cirkel. Als de lijn omlaaggaat, wordt je sneller en verbeter je.</p>
 </div>
 </div>
 <h3>Jouw vooruitgang</h3>
@@ -94,7 +94,7 @@ function endCircle(){const e=Date.now();times.push((e-startTime)/1e3),mistakes.p
 function endGame(){document.querySelector(".game-section").style.display="none",results.style.display="flex",drawLearningCurve(),displayScreenshots()}
 function drawLearningCurve(){drawMistakeChart(),drawTimeChart()}
 function drawTimeChart(){const e=document.getElementById("timeChart").getContext("2d");new Chart(e,{type:"line",data:{labels:["1","2","3"],datasets:[{label:"Snelheid (seconden)",data:times.slice(1),borderColor:"#3498db",backgroundColor:"rgba(52, 152, 219, 0.2)",tension:.1,fill:!0}]},options:{responsive:!0,scales:{y:{beginAtZero:!0,title:{display:!0,text:"Snelheid (seconden)"}},x:{title:{display:!0,text:"Cirkel Nummer"}}},plugins:{title:{display:!1}}}})}
-function drawMistakeChart(){const e=document.getElementById("mistakeChart").getContext("2d");new Chart(e,{type:"line",data:{labels:["1","2","3"],datasets:[{label:"Aantal fouten",data:mistakes.slice(1),borderColor:"#e74c3c",backgroundColor:"rgba(231, 76, 60, 0.2)",tension:.1,fill:!0}]},options:{responsive:!0,scales:{y:{beginAtZero:!0,title:{display:!0,text:"Aantal fouten"}},x:{title:{display:!0,text:"Cirkel Nummer"}}},plugins:{title:{display:!1}}}})}
+function drawMistakeChart(){const e=document.getElementById("mistakeChart").getContext("2d");new Chart(e,{type:"line",data:{labels:["1","2","3"],datasets:[{label:"Aantal fouten",data:mistakes.slice(1),borderColor:"#e74c3c",backgroundColor:"rgba(231, 76, 60, 0.2)",tension:.1,fill:!0}]},options:{responsive:!0,scales:{y:{beginAtZero:!0,title:{display:!0,text:"Aantal fouten"},ticks:{stepSize: 1}},x:{title:{display:!0,text:"Cirkel Nummer"}}},plugins:{title:{display:!1}}}})}
 function displayScreenshots(){const e=document.getElementById("screenshotsContainer");screenshots.forEach((t,a)=>{const r=document.createElement("div");r.className="screenshot";const n=document.createElement("img");n.src=t,n.alt=`Circle ${a}`;const i=document.createElement("p");i.className="screenshot-caption",i.textContent=0===a?"Zonder spiegel":`Cirkel ${a}`,r.appendChild(n),r.appendChild(i),e.appendChild(r)})}
 function moveCursor(e){const t=trackpad.getBoundingClientRect(),a=(e.clientX||e.touches[0].clientX)-t.left,r=(e.clientY||e.touches[0].clientY)-t.top;if(isFirstMove)return lastTrackpadX=a,lastTrackpadY=r,void(isFirstMove=!1);const n=a-lastTrackpadX,i=r-lastTrackpadY;lastTrackpadX=a,lastTrackpadY=r;const s=lastX+(isNoMirror?1:-1)*n,o=lastY+(isNoMirror?1:-1)*i,c=Math.max(0,Math.min(s,gameArea.offsetWidth-6)),d=Math.max(0,Math.min(o,gameArea.offsetHeight-6));setCursorPosition(c,d),pathCtx.beginPath(),pathCtx.moveTo(lastX,lastY),pathCtx.lineTo(c,d),pathCtx.strokeStyle="rgba(52, 152, 219, 0.5)",pathCtx.lineWidth=2,pathCtx.stroke(),lastX=c,lastY=d,checkCircleProgress(c,d)}
 function checkCircleProgress(e,t){const a=Math.sqrt(Math.pow(e-centerX,2)+Math.pow(t-centerY,2));if(a>=innerRadius&&a<=outerRadius){isOutside&&(isOutside=!1,outsideStartTime=0);const a=Math.sqrt(Math.pow(e-startX,2)+Math.pow(t-startY,2));a>50&&(hasCompletedLoop=!0),hasCompletedLoop&&a<10&&endCircle()}else isOutside||(isOutside=!0,outsideStartTime=Date.now(),currentMistakes++,updateMistakeCount(),showMistakeIndicator(e,t))}
