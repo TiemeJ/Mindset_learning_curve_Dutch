@@ -211,19 +211,17 @@ function generateCircleTrail(){
     }
     innerStarPath.closePath();
     
-    // Draw outer star on game canvas with BLUE color
+    // Draw outer star on game canvas with GREEN color
     ctx.beginPath();
-    ctx.stroke(outerStarPath);
-    ctx.strokeStyle = "#3498db"; // Blue color for outer star
+    ctx.strokeStyle = "#2ecc71"; // Green color for outer star
     ctx.lineWidth = 2;
-    ctx.stroke();
+    ctx.stroke(outerStarPath);
     
     // Draw inner star on game canvas with GREEN color
     ctx.beginPath();
-    ctx.stroke(innerStarPath);
     ctx.strokeStyle = "#2ecc71"; // Green color for inner star
     ctx.lineWidth = 2;
-    ctx.stroke();
+    ctx.stroke(innerStarPath);
     
     // Store paths for collision detection
     outerStarCtx.stroke(outerStarPath);
@@ -276,7 +274,7 @@ function drawArrow(fromX, fromY, toX, toY) {
     ctx.lineTo(toX - arrowSize * Math.cos(angle - Math.PI/6), toY - arrowSize * Math.sin(angle - Math.PI/6));
     ctx.moveTo(toX, toY);
     ctx.lineTo(toX - arrowSize * Math.cos(angle + Math.PI/6), toY - arrowSize * Math.sin(angle + Math.PI/6));
-    ctx.strokeStyle = "#3498db";
+    ctx.strokeStyle = "#2ecc71"; // Changed to green
     ctx.lineWidth = 3;
     ctx.stroke();
 }
