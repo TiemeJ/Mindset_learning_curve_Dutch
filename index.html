@@ -55,7 +55,7 @@ p{text-align:center;line-height:1.6;margin-bottom:20px;max-width:600px}
 <div class="container">
 <h1 class="main-title">Spiegeltekenen</h1>
 <div class="game-section">
-<p id="instructions"><strong>Zonder spiegel:</strong> Gebruik het trackpad (rechter vierkant) om het blauwe balletje tussen de groene cirkels te verplaatsen. Begin bij de pijl en voltooi de cirkel. Deze opdracht is nog zonder spiegel.</p>
+<p id="instructions"><strong>Zonder spiegel:</strong> Gebruik het trackpad (rechter vierkant) om het blauwe balletje tussen de groene sterren te verplaatsen. Begin bij de pijl en voltooi de ster. Deze opdracht is nog zonder spiegel.</p>
 <div id="gameContainer">
 <div id="gameArea"><canvas id="trail"></canvas><canvas id="cursorPath"></canvas><div id="cursor"></div><div id="mistakeIndicator"></div></div>
 <div id="trackpad"></div>
@@ -68,12 +68,12 @@ p{text-align:center;line-height:1.6;margin-bottom:20px;max-width:600px}
 <div class="chart-column">
 <div class="chart-title"><strong>Nauwkeurigheid</div>
 <div class="chart-container"><canvas id="mistakeChart"></canvas></div>
-<p class="chart-description" style="font-style: italic; font-weight: normal">Dit grafiekje laat jouw nauwkeurigheid zien voor elke cirkel. Als de lijn omlaaggaat, maak je minder fouten.</p>
+<p class="chart-description" style="font-style: italic; font-weight: normal">Dit grafiekje laat jouw nauwkeurigheid zien voor elke ster. Als de lijn omlaaggaat, maak je minder fouten.</p>
 </div>
 <div class="chart-column">
 <div class="chart-title"><strong>Snelheid</div>
 <div class="chart-container"><canvas id="timeChart"></canvas></div>
-<p class="chart-description" style="font-style: italic; font-weight: normal">Dit grafiekje laat jouw snelheid zien voor elke cirkel. Als de lijn omlaaggaat, wordt je sneller.</p>
+<p class="chart-description" style="font-style: italic; font-weight: normal">Dit grafiekje laat jouw snelheid zien voor elke ster. Als de lijn omlaaggaat, wordt je sneller.</p>
 </div>
 </div>
 <h3>Jouw vooruitgang</h3>
@@ -83,24 +83,497 @@ p{text-align:center;line-height:1.6;margin-bottom:20px;max-width:600px}
 </div>
 <footer>&copy; 2025 Spiegeltekenen Spel - Vrije Universiteit</footer>
 <script>
-const gameArea=document.getElementById("gameArea"),trackpad=document.getElementById("trackpad"),cursor=document.getElementById("cursor"),trail=document.getElementById("trail"),cursorPath=document.getElementById("cursorPath"),ctx=trail.getContext("2d"),pathCtx=cursorPath.getContext("2d"),scoreDisplay=document.getElementById("score"),mistakeCountDisplay=document.getElementById("mistakeCount"),results=document.getElementById("results"),mistakeIndicator=document.getElementById("mistakeIndicator"),instructions=document.getElementById("instructions");
-let circleCount=0,startTime,times=[],mistakes=[],lastX,lastY,startX,startY,outerRadius,innerRadius,isFirstMove=!0,lastTrackpadX,lastTrackpadY,hasStartedRound=!1,hasCompletedLoop=!1,centerX,centerY,isOutside=!1,outsideStartTime=0,currentMistakes=0,screenshots=[],isNoMirror=!0;
-function generateCircleTrail(){centerX=trail.width/2,centerY=trail.height/2,outerRadius=140,innerRadius=120,ctx.clearRect(0,0,trail.width,trail.height),pathCtx.clearRect(0,0,cursorPath.width,cursorPath.height),drawCircle(centerX,centerY,outerRadius),drawCircle(centerX,centerY,innerRadius),startX=centerX,startY=centerY-130,drawArrow(startX,startY-20,startX,startY),hasStartedRound||(setCursorPosition(startX,startY),lastX=startX,lastY=startY),pathCtx.beginPath(),pathCtx.moveTo(lastX,lastY),isFirstMove=!0,hasCompletedLoop=!1,currentMistakes=0,updateMistakeCount()}
-function drawCircle(e,t,a){ctx.beginPath(),ctx.arc(e,t,a,0,2*Math.PI),ctx.strokeStyle="#2ecc71",ctx.lineWidth=2,ctx.stroke()}
-function drawArrow(e,t,a,r){const n=10,i=Math.atan2(r-t,a-e);ctx.beginPath(),ctx.moveTo(e,t),ctx.lineTo(a,r),ctx.lineTo(a-n*Math.cos(i-Math.PI/6),r-n*Math.sin(i-Math.PI/6)),ctx.moveTo(a,r),ctx.lineTo(a-n*Math.cos(i+Math.PI/6),r-n*Math.sin(i+Math.PI/6)),ctx.strokeStyle="#3498db",ctx.lineWidth=3,ctx.stroke()}
-function setCursorPosition(e,t){cursor.style.left=`${e-3}px`,cursor.style.top=`${t-3}px`}
-function startCircle(){generateCircleTrail(),hasStartedRound||(startTime=Date.now(),hasStartedRound=!0)}
-function endCircle(){const e=Date.now();times.push((e-startTime)/1e3),mistakes.push(currentMistakes);const t=document.createElement("canvas");t.width=gameArea.offsetWidth,t.height=gameArea.offsetHeight;const a=t.getContext("2d");a.drawImage(trail,0,0),a.drawImage(cursorPath,0,0),screenshots.push(t.toDataURL()),circleCount++,isNoMirror?(isNoMirror=!1,instructions.innerHTML="<strong>Met spiegel:</strong> Gebruik het trackpad (rechter vak) om het blauwe balletje tussen de groene cirkels te verplaatsen. Het balletje beweegt nu in de tegenovergestelde richting (gespiegeld). Voltooi 3 cirkels, beginnend bij de pijl.",scoreDisplay.textContent="Cirkel: 1/3",hasStartedRound=!1,isOutside=!1,outsideStartTime=0,startCircle()):circleCount<=3?(scoreDisplay.textContent=`Cirkel: ${circleCount}/3`,hasStartedRound=!1,isOutside=!1,outsideStartTime=0,startCircle()):endGame()}
-function endGame(){document.querySelector(".game-section").style.display="none",results.style.display="flex",drawLearningCurve(),displayScreenshots()}
-function drawLearningCurve(){drawMistakeChart(),drawTimeChart()}
-function drawTimeChart(){const e=document.getElementById("timeChart").getContext("2d");new Chart(e,{type:"line",data:{labels:["1","2","3"],datasets:[{label:"Snelheid (seconden)",data:times.slice(1),borderColor:"#3498db",backgroundColor:"rgba(52, 152, 219, 0.2)",tension:.1,fill:!0}]},options:{responsive:!0,scales:{y:{beginAtZero:!0,title:{display:!0,text:"Snelheid (seconden)",font:{size:16}},ticks:{font:{size:14}}},x:{title:{display:!0,text:"Cirkel Nummer",font:{size:16}},ticks:{font:{size:14}}}},plugins:{title:{display:!1},legend:{display:!1}}}})}
-function drawMistakeChart(){const e=document.getElementById("mistakeChart").getContext("2d");new Chart(e,{type:"line",data:{labels:["1","2","3"],datasets:[{label:"Aantal fouten",data:mistakes.slice(1),borderColor:"#e74c3c",backgroundColor:"rgba(231, 76, 60, 0.2)",tension:.1,fill:!0}]},options:{responsive:!0,scales:{y:{beginAtZero:!0,title:{display:!0,text:"Aantal fouten",font:{size:16}},ticks:{stepSize:1,font:{size:14}}},x:{title:{display:!0,text:"Cirkel Nummer",font:{size:16}},ticks:{font:{size:14}}}},plugins:{title:{display:!1},legend:{display:!1}}}})}
-function displayScreenshots(){const e=document.getElementById("screenshotsContainer");screenshots.forEach((t,a)=>{const r=document.createElement("div");r.className="screenshot";const n=document.createElement("img");n.src=t,n.alt=`Circle ${a}`;const i=document.createElement("p");i.className="screenshot-caption",i.textContent=0===a?"Zonder spiegel":`Cirkel ${a}`,r.appendChild(n),r.appendChild(i),e.appendChild(r)})}
-function moveCursor(e){const t=trackpad.getBoundingClientRect(),a=(e.clientX||e.touches[0].clientX)-t.left,r=(e.clientY||e.touches[0].clientY)-t.top;if(isFirstMove)return lastTrackpadX=a,lastTrackpadY=r,void(isFirstMove=!1);const n=a-lastTrackpadX,i=r-lastTrackpadY;lastTrackpadX=a,lastTrackpadY=r;const s=lastX+(isNoMirror?1:-1)*n,o=lastY+(isNoMirror?1:-1)*i,c=Math.max(0,Math.min(s,gameArea.offsetWidth-6)),d=Math.max(0,Math.min(o,gameArea.offsetHeight-6));setCursorPosition(c,d),pathCtx.beginPath(),pathCtx.moveTo(lastX,lastY),pathCtx.lineTo(c,d),pathCtx.strokeStyle="rgba(52, 152, 219, 0.5)",pathCtx.lineWidth=2,pathCtx.stroke(),lastX=c,lastY=d,checkCircleProgress(c,d)}
-function checkCircleProgress(e,t){const a=Math.sqrt(Math.pow(e-centerX,2)+Math.pow(t-centerY,2));if(a>=innerRadius&&a<=outerRadius){isOutside&&(isOutside=!1,outsideStartTime=0);const a=Math.sqrt(Math.pow(e-startX,2)+Math.pow(t-startY,2));a>50&&(hasCompletedLoop=!0),hasCompletedLoop&&a<10&&endCircle()}else isOutside||(isOutside=!0,outsideStartTime=Date.now(),currentMistakes++,updateMistakeCount(),showMistakeIndicator(e,t))}
-function showMistakeIndicator(e,t){cursor.style.backgroundColor="#e74c3c",mistakeIndicator.style.left=`${e-20}px`,mistakeIndicator.style.top=`${t-20}px`,mistakeIndicator.style.display="block",mistakeIndicator.style.animation="none",mistakeIndicator.offsetHeight,mistakeIndicator.style.animation=null,setTimeout(()=>{cursor.style.backgroundColor="#3498db",mistakeIndicator.style.display="none"},500)}
-function updateMistakeCount(){mistakeCountDisplay.textContent=`Fouten: ${currentMistakes}`}
-trail.width=gameArea.offsetWidth,trail.height=gameArea.offsetHeight,cursorPath.width=gameArea.offsetWidth,cursorPath.height=gameArea.offsetHeight,trackpad.addEventListener("mousedown",e=>{isFirstMove=!0,moveCursor(e)}),trackpad.addEventListener("mousemove",e=>{e.buttons>0&&moveCursor(e)}),trackpad.addEventListener("touchstart",e=>{e.preventDefault(),isFirstMove=!0,moveCursor(e.touches[0])}),trackpad.addEventListener("touchmove",e=>{e.preventDefault(),moveCursor(e.touches[0])}),startCircle();
+const gameArea = document.getElementById("gameArea");
+const trackpad = document.getElementById("trackpad");
+const cursor = document.getElementById("cursor");
+const trail = document.getElementById("trail");
+const cursorPath = document.getElementById("cursorPath");
+const ctx = trail.getContext("2d");
+const pathCtx = cursorPath.getContext("2d");
+const scoreDisplay = document.getElementById("score");
+const mistakeCountDisplay = document.getElementById("mistakeCount");
+const results = document.getElementById("results");
+const mistakeIndicator = document.getElementById("mistakeIndicator");
+const instructions = document.getElementById("instructions");
+
+// Game state variables
+let circleCount = 0;
+let startTime;
+let times = [];
+let mistakes = [];
+let lastX, lastY, startX, startY;
+let isFirstMove = true;
+let lastTrackpadX, lastTrackpadY;
+let hasStartedRound = false;
+let hasCompletedLoop = false;
+let centerX, centerY;
+let isOutside = false;
+let outsideStartTime = 0;
+let currentMistakes = 0;
+let screenshots = [];
+let isNoMirror = true;
+
+// Star specific variables
+let starPoints = 5;  // Number of points in the star
+let starRotation = -Math.PI / 2;  // Starting with a point at the bottom
+let outerRadius, innerRadius;
+
+// Create offscreen canvases for collision detection
+const outerStarCanvas = document.createElement('canvas');
+const innerStarCanvas = document.createElement('canvas');
+let outerStarCtx, innerStarCtx;
+let outerStarPath, innerStarPath;
+
+function initStarCanvases() {
+    outerStarCanvas.width = trail.width;
+    outerStarCanvas.height = trail.height;
+    innerStarCanvas.width = trail.width;
+    innerStarCanvas.height = trail.height;
+    
+    outerStarCtx = outerStarCanvas.getContext('2d');
+    innerStarCtx = innerStarCanvas.getContext('2d');
+}
+
+// Function to create a star path (returns the path for future use)
+function createStarPath(ctx, cx, cy, outerRadius, innerRadius, points, rotation) {
+    ctx.beginPath();
+    
+    for (let i = 0; i < points * 2; i++) {
+        const angle = (i * Math.PI / points) + rotation;
+        const radius = i % 2 === 0 ? outerRadius : innerRadius;
+        const x = cx + radius * Math.cos(angle);
+        const y = cy + radius * Math.sin(angle);
+        
+        if (i === 0) {
+            ctx.moveTo(x, y);
+        } else {
+            ctx.lineTo(x, y);
+        }
+    }
+    
+    ctx.closePath();
+    return ctx;
+}
+
+// Check if a point is between the two stars
+function isPointBetweenStars(x, y) {
+    // Check if point is inside outer star but outside inner star
+    return outerStarCtx.isPointInPath(outerStarPath, x, y) && 
+           !innerStarCtx.isPointInPath(innerStarPath, x, y);
+}
+
+function generateCircleTrail(){
+    // Set dimensions and clear canvases
+    centerX = trail.width / 2;
+    centerY = trail.height / 2;
+    outerRadius = 140;
+    innerRadius = 80;  // Smaller inner radius for more distinct star shape
+    
+    ctx.clearRect(0, 0, trail.width, trail.height);
+    pathCtx.clearRect(0, 0, cursorPath.width, cursorPath.height);
+    
+    // Create and store the star paths for collision detection
+    outerStarCtx.clearRect(0, 0, outerStarCanvas.width, outerStarCanvas.height);
+    innerStarCtx.clearRect(0, 0, innerStarCanvas.width, innerStarCanvas.height);
+    
+    // Make sure the stars are drawn with a point at the top
+    starRotation = -Math.PI / 2;
+    
+    // Create outer star path
+    outerStarPath = new Path2D();
+    for (let i = 0; i < starPoints * 2; i++) {
+        const angle = (i * Math.PI / starPoints) + starRotation;
+        const radius = i % 2 === 0 ? outerRadius : outerRadius * 0.4;
+        const x = centerX + radius * Math.cos(angle);
+        const y = centerY + radius * Math.sin(angle);
+        
+        if (i === 0) {
+            outerStarPath.moveTo(x, y);
+        } else {
+            outerStarPath.lineTo(x, y);
+        }
+    }
+    outerStarPath.closePath();
+    
+    // Create inner star path
+    innerStarPath = new Path2D();
+    for (let i = 0; i < starPoints * 2; i++) {
+        const angle = (i * Math.PI / starPoints) + starRotation;
+        const radius = i % 2 === 0 ? innerRadius : innerRadius * 0.4;
+        const x = centerX + radius * Math.cos(angle);
+        const y = centerY + radius * Math.sin(angle);
+        
+        if (i === 0) {
+            innerStarPath.moveTo(x, y);
+        } else {
+            innerStarPath.lineTo(x, y);
+        }
+    }
+    innerStarPath.closePath();
+    
+    // Draw outer star on game canvas with BLUE color
+    ctx.beginPath();
+    ctx.stroke(outerStarPath);
+    ctx.strokeStyle = "#3498db"; // Blue color for outer star
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    
+    // Draw inner star on game canvas with GREEN color
+    ctx.beginPath();
+    ctx.stroke(innerStarPath);
+    ctx.strokeStyle = "#2ecc71"; // Green color for inner star
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    
+    // Store paths for collision detection
+    outerStarCtx.stroke(outerStarPath);
+    innerStarCtx.stroke(innerStarPath);
+    
+    // Position the starting point at the bottom between stars
+    const bottomValleyRadius = outerRadius * 0.4; // Valley radius
+    const corridorWidth = bottomValleyRadius - (innerRadius * 0.4);
+    
+    // Place the ball 60% of the way from inner to outer star
+    startX = centerX -1;
+    startY = centerY + (innerRadius * 0.4) + (corridorWidth * 0.6);
+    
+    // MODIFIED PART: Position the arrow at the bottom point of the star pointing upward
+    // Calculate the position for the bottom point of the star
+    const bottomPointX = centerX;
+    const bottomPointY = centerY + (outerRadius * 0.6); // Bottom point of the star
+    
+    // Position the arrow below the bottom point
+    const arrowPointX = bottomPointX;
+    const arrowPointY = bottomPointY - 15; // Just inside the star's edge
+    
+    // Start the arrow further down
+    const arrowStartX = bottomPointX;
+    const arrowStartY = bottomPointY + 5; // Below the star
+    
+    drawArrow(arrowStartX, arrowStartY, arrowPointX, arrowPointY);
+    
+    if(!hasStartedRound) {
+        setCursorPosition(startX, startY);
+        lastX = startX;
+        lastY = startY;
+    }
+    
+    pathCtx.beginPath();
+    pathCtx.moveTo(lastX, lastY);
+    isFirstMove = true;
+    hasCompletedLoop = false;
+    currentMistakes = 0;
+    updateMistakeCount();
+}
+
+function drawArrow(fromX, fromY, toX, toY) {
+    const arrowSize = 10;
+    const angle = Math.atan2(toY - fromY, toX - fromX);
+    
+    ctx.beginPath();
+    ctx.moveTo(fromX, fromY);
+    ctx.lineTo(toX, toY);
+    ctx.lineTo(toX - arrowSize * Math.cos(angle - Math.PI/6), toY - arrowSize * Math.sin(angle - Math.PI/6));
+    ctx.moveTo(toX, toY);
+    ctx.lineTo(toX - arrowSize * Math.cos(angle + Math.PI/6), toY - arrowSize * Math.sin(angle + Math.PI/6));
+    ctx.strokeStyle = "#3498db";
+    ctx.lineWidth = 3;
+    ctx.stroke();
+}
+
+function setCursorPosition(x, y) {
+    cursor.style.left = `${x - 3}px`;
+    cursor.style.top = `${y - 3}px`;
+}
+
+function startCircle() {
+    generateCircleTrail();
+    if (!hasStartedRound) {
+        startTime = Date.now();
+        hasStartedRound = true;
+    }
+}
+
+function endCircle() {
+    const endTime = Date.now();
+    times.push((endTime - startTime) / 1000);
+    mistakes.push(currentMistakes);
+    
+    // Create screenshot
+    const screenshot = document.createElement("canvas");
+    screenshot.width = gameArea.offsetWidth;
+    screenshot.height = gameArea.offsetHeight;
+    const screenshotCtx = screenshot.getContext("2d");
+    screenshotCtx.drawImage(trail, 0, 0);
+    screenshotCtx.drawImage(cursorPath, 0, 0);
+    screenshots.push(screenshot.toDataURL());
+    
+    circleCount++;
+    
+    if (isNoMirror) {
+        isNoMirror = false;
+        instructions.innerHTML = "<strong>Met spiegel:</strong> Gebruik het trackpad (rechter vak) om het blauwe balletje tussen de groene sterren te verplaatsen. Het balletje beweegt nu in de tegenovergestelde richting (gespiegeld). Voltooi 3 sterren, beginnend bij de pijl.";
+        scoreDisplay.textContent = "Ster: 1/3";
+        hasStartedRound = false;
+        isOutside = false;
+        outsideStartTime = 0;
+        startCircle();
+    } else if (circleCount <= 3) {
+        scoreDisplay.textContent = `Ster: ${circleCount}/3`;
+        hasStartedRound = false;
+        isOutside = false;
+        outsideStartTime = 0;
+        startCircle();
+    } else {
+        endGame();
+    }
+}
+
+function endGame() {
+    document.querySelector(".game-section").style.display = "none";
+    results.style.display = "flex";
+    drawLearningCurve();
+    displayScreenshots();
+}
+
+function drawLearningCurve() {
+    drawMistakeChart();
+    drawTimeChart();
+}
+
+function drawTimeChart() {
+    const timeChartCtx = document.getElementById("timeChart").getContext("2d");
+    new Chart(timeChartCtx, {
+        type: "line",
+        data: {
+            labels: ["1", "2", "3"],
+            datasets: [{
+                label: "Snelheid (seconden)",
+                data: times.slice(1),
+                borderColor: "#3498db",
+                backgroundColor: "rgba(52, 152, 219, 0.2)",
+                tension: 0.1,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: "Snelheid (seconden)",
+                        font: {size: 16}
+                    },
+                    ticks: {font: {size: 14}}
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: "Ster Nummer",
+                        font: {size: 16}
+                    },
+                    ticks: {font: {size: 14}}
+                }
+            },
+            plugins: {
+                title: {display: false},
+                legend: {display: false}
+            }
+        }
+    });
+}
+
+function drawMistakeChart() {
+    const mistakeChartCtx = document.getElementById("mistakeChart").getContext("2d");
+    new Chart(mistakeChartCtx, {
+        type: "line",
+        data: {
+            labels: ["1", "2", "3"],
+            datasets: [{
+                label: "Aantal fouten",
+                data: mistakes.slice(1),
+                borderColor: "#e74c3c",
+                backgroundColor: "rgba(231, 76, 60, 0.2)",
+                tension: 0.1,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: "Aantal fouten",
+                        font: {size: 16}
+                    },
+                    ticks: {stepSize: 1, font: {size: 14}}
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: "Ster Nummer",
+                        font: {size: 16}
+                    },
+                    ticks: {font: {size: 14}}
+                }
+            },
+            plugins: {
+                title: {display: false},
+                legend: {display: false}
+            }
+        }
+    });
+}
+
+function displayScreenshots() {
+    const screenshotsContainer = document.getElementById("screenshotsContainer");
+    screenshots.forEach((screenshot, index) => {
+        const screenshotDiv = document.createElement("div");
+        screenshotDiv.className = "screenshot";
+        
+        const img = document.createElement("img");
+        img.src = screenshot;
+        img.alt = `Ster ${index}`;
+        
+        const caption = document.createElement("p");
+        caption.className = "screenshot-caption";
+        caption.textContent = index === 0 ? "Zonder spiegel" : `Ster ${index}`;
+        
+        screenshotDiv.appendChild(img);
+        screenshotDiv.appendChild(caption);
+        screenshotsContainer.appendChild(screenshotDiv);
+    });
+}
+
+function moveCursor(e) {
+    const trackpadRect = trackpad.getBoundingClientRect();
+    const currentX = (e.clientX || e.touches[0].clientX) - trackpadRect.left;
+    const currentY = (e.clientY || e.touches[0].clientY) - trackpadRect.top;
+    
+    if (isFirstMove) {
+        lastTrackpadX = currentX;
+        lastTrackpadY = currentY;
+        isFirstMove = false;
+        return;
+    }
+    
+    const deltaX = currentX - lastTrackpadX;
+    const deltaY = currentY - lastTrackpadY;
+    lastTrackpadX = currentX;
+    lastTrackpadY = currentY;
+    
+    const newX = lastX + (isNoMirror ? 1 : -1) * deltaX;
+    const newY = lastY + (isNoMirror ? 1 : -1) * deltaY;
+    
+    // Constrain cursor to game area
+    const constrainedX = Math.max(0, Math.min(newX, gameArea.offsetWidth - 6));
+    const constrainedY = Math.max(0, Math.min(newY, gameArea.offsetHeight - 6));
+    
+    setCursorPosition(constrainedX, constrainedY);
+    
+    // Draw cursor trail
+    pathCtx.beginPath();
+    pathCtx.moveTo(lastX, lastY);
+    pathCtx.lineTo(constrainedX, constrainedY);
+    pathCtx.strokeStyle = "rgba(52, 152, 219, 0.5)";
+    pathCtx.lineWidth = 2;
+    pathCtx.stroke();
+    
+    lastX = constrainedX;
+    lastY = constrainedY;
+    
+    checkCircleProgress(constrainedX, constrainedY);
+}
+
+function checkCircleProgress(x, y) {
+    // Check if cursor is between the two stars
+    if (isPointBetweenStars(x, y)) {
+        if (isOutside) {
+            isOutside = false;
+            outsideStartTime = 0;
+        }
+        
+        // Check if we've completed a loop
+        const distanceToStart = Math.sqrt(Math.pow(x - startX, 2) + Math.pow(y - startY, 2));
+        if (distanceToStart > 50) {
+            hasCompletedLoop = true;
+        }
+        
+        // If we've gone around and are close to the start, end the circle
+        if (hasCompletedLoop && distanceToStart < 10) {
+            endCircle();
+        }
+    } else {
+        // Cursor is outside the corridor
+        if (!isOutside) {
+            isOutside = true;
+            outsideStartTime = Date.now();
+            currentMistakes++;
+            updateMistakeCount();
+            showMistakeIndicator(x, y);
+        }
+    }
+}
+
+function showMistakeIndicator(x, y) {
+    cursor.style.backgroundColor = "#e74c3c";
+    mistakeIndicator.style.left = `${x - 20}px`;
+    mistakeIndicator.style.top = `${y - 20}px`;
+    mistakeIndicator.style.display = "block";
+    
+    // Reset and trigger animation
+    mistakeIndicator.style.animation = "none";
+    mistakeIndicator.offsetHeight; // Force reflow
+    mistakeIndicator.style.animation = null;
+    
+    setTimeout(() => {
+        cursor.style.backgroundColor = "#3498db";
+        mistakeIndicator.style.display = "none";
+    }, 500);
+}
+
+function updateMistakeCount() {
+    mistakeCountDisplay.textContent = `Fouten: ${currentMistakes}`;
+}
+
+// Initialize canvas sizes
+trail.width = gameArea.offsetWidth;
+trail.height = gameArea.offsetHeight;
+cursorPath.width = gameArea.offsetWidth;
+cursorPath.height = gameArea.offsetHeight;
+
+// Initialize offscreen canvases for collision detection
+initStarCanvases();
+
+// Set up event listeners
+trackpad.addEventListener("mousedown", e => {
+    isFirstMove = true;
+    moveCursor(e);
+});
+
+trackpad.addEventListener("mousemove", e => {
+    if (e.buttons > 0) {
+        moveCursor(e);
+    }
+});
+
+trackpad.addEventListener("touchstart", e => {
+    e.preventDefault();
+    isFirstMove = true;
+    moveCursor(e);
+});
+
+trackpad.addEventListener("touchmove", e => {
+    e.preventDefault();
+    moveCursor(e);
+});
+
+// Start the game
+startCircle();
 </script>
 </body>
 </html>
