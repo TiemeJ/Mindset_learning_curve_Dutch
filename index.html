@@ -265,18 +265,49 @@ function generateCircleTrail(){
 }
 
 function drawArrow(fromX, fromY, toX, toY) {
-    const arrowSize = 10;
-    const angle = Math.atan2(toY - fromY, toX - fromX);
+    // Arrow dimensions - adjusted for better proportions
+    const arrowLength = Math.sqrt(Math.pow(toX - fromX, 2) + Math.pow(toY - fromY, 2));
+    const headLength = 10; // Shorter head length
+    const headWidth = 8; // Slightly narrower head width
+    const shaftWidth = 3; // Width of the arrow shaft
     
+    // Calculate direction vector
+    const dirX = (toX - fromX) / arrowLength;
+    const dirY = (toY - fromY) / arrowLength;
+    
+    // Calculate perpendicular vector
+    const perpX = -dirY;
+    const perpY = dirX;
+    
+    // Calculate points for the arrow
+    const tipX = toX;
+    const tipY = toY;
+    
+    const backX = toX - (headLength * dirX);
+    const backY = toY - (headLength * dirY);
+    
+    const leftX = backX - (headWidth/2 * perpX);
+    const leftY = backY - (headWidth/2 * perpY);
+    
+    const rightX = backX + (headWidth/2 * perpX);
+    const rightY = backY + (headWidth/2 * perpY);
+    
+    // Draw the arrow shaft
     ctx.beginPath();
     ctx.moveTo(fromX, fromY);
-    ctx.lineTo(toX, toY);
-    ctx.lineTo(toX - arrowSize * Math.cos(angle - Math.PI/6), toY - arrowSize * Math.sin(angle - Math.PI/6));
-    ctx.moveTo(toX, toY);
-    ctx.lineTo(toX - arrowSize * Math.cos(angle + Math.PI/6), toY - arrowSize * Math.sin(angle + Math.PI/6));
-    ctx.strokeStyle = "#2ecc71"; // Changed to green
-    ctx.lineWidth = 3;
+    ctx.lineTo(backX, backY);
+    ctx.lineWidth = shaftWidth;
+    ctx.strokeStyle = "#2ecc71";
     ctx.stroke();
+    
+    // Draw the arrow head as a filled triangle
+    ctx.beginPath();
+    ctx.moveTo(tipX, tipY); // Tip of the arrow
+    ctx.lineTo(leftX, leftY); // Left corner
+    ctx.lineTo(rightX, rightY); // Right corner
+    ctx.closePath();
+    ctx.fillStyle = "#2ecc71";
+    ctx.fill();
 }
 
 function setCursorPosition(x, y) {
